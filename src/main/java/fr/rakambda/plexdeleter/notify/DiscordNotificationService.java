@@ -239,10 +239,13 @@ public class DiscordNotificationService extends AbstractNotificationService{
 					.value(String.join(", ", genres))
 					.build());
 		}
-		embed.field(Field.builder()
-				.name(messageSource.getMessage("discord.media.available.body.length", new Object[0], locale))
-				.value(getMediaDuration(Duration.ofMillis(metadata.getDuration())))
-				.build());
+		Optional.ofNullable(metadata.getDuration())
+				.map(Duration::ofMillis)
+				.map(this::getMediaDuration)
+				.ifPresent(duration -> embed.field(Field.builder()
+						.name(messageSource.getMessage("discord.media.available.body.length", new Object[0], locale))
+						.value(duration)
+						.build()));
 		if(!audioLanguages.isEmpty()){
 			embed.field(Field.builder()
 					.name(messageSource.getMessage("discord.media.available.body.audios", new Object[0], locale))

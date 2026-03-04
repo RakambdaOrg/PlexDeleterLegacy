@@ -85,8 +85,9 @@ public class GetMetadataResponse{
 	@JsonProperty("genres")
 	@NonNull
 	private List<String> genres = new LinkedList<>();
+	@Nullable
 	@JsonProperty("duration")
-	private long duration;
+	private Long duration;
 	@JsonProperty("guid")
 	@Nullable
 	@JsonDeserialize(using = EmptyStringAsNullDeserializer.class)

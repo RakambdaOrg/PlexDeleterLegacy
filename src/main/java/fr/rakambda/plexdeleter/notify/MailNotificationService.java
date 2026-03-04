@@ -218,6 +218,12 @@ public class MailNotificationService extends AbstractNotificationService{
 				.flatMap(c -> c.getServerTags(media))
 				.orElseGet(List::of);
 		
+		var duration = metadata
+				.map(GetMetadataResponse::getDuration)
+				.map(Duration::ofMillis)
+				.map(this::getMediaDuration)
+				.orElse(null);
+		
 		sendMail(notification, subjectKey, locale, "mail/media-detailed.html", context -> {
 			context.setLocale(userGroupEntity.getLocaleAsObject());
 			context.setVariable("thymeleafService", thymeleafService);
@@ -228,7 +234,7 @@ public class MailNotificationService extends AbstractNotificationService{
 			context.setVariable("mediaReleaseDate", releaseDate);
 			context.setVariable("mediaActors", metadata.stream().map(GetMetadataResponse::getActors).flatMap(Collection::stream).limit(20).toList());
 			context.setVariable("mediaGenres", genres);
-			context.setVariable("mediaDuration", metadata.map(m -> getMediaDuration(Duration.ofMillis(m.getDuration()))).orElse(null));
+			context.setVariable("mediaDuration", duration);
 			context.setVariable("mediaPosterResourceName", posterData.isPresent() ? mediaPosterResourceName : null);
 			context.setVariable("mediaAudios", audioLanguages);
 			context.setVariable("mediaSubtitles", subtitleLanguages);
