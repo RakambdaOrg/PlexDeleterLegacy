@@ -4,7 +4,6 @@ import fr.rakambda.plexdeleter.config.ApplicationConfiguration;
 import org.jspecify.annotations.NonNull;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.CustomExchange;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.Queue;
@@ -22,7 +21,6 @@ import org.springframework.core.retry.RetryTemplate;
 import org.springframework.util.backoff.ExponentialBackOff;
 import tools.jackson.databind.json.JsonMapper;
 import java.time.Duration;
-import java.util.Map;
 
 @Configuration
 @EnableRabbit
@@ -38,9 +36,8 @@ public class AmqpConfiguration{
 	
 	@Bean
 	@Qualifier("exchangeProcess")
-	public CustomExchange exchangeProcess(){
-		return new CustomExchange(prefixed(amqpConstants.EXCHANGE_PROCESS), "x-delayed-message", true, false,
-				Map.of("x-delayed-type", "direct"));
+	public DirectExchange exchangeProcess(){
+		return ExchangeBuilder.directExchange(prefixed(amqpConstants.EXCHANGE_PROCESS)).durable(true).build();
 	}
 	
 	@Bean
@@ -109,20 +106,20 @@ public class AmqpConfiguration{
 	
 	@Bean
 	@Qualifier("bindingProcessRadarr")
-	public Binding bindingProcessRadarr(@Qualifier("queueProcessRadarr") Queue queue, @Qualifier("exchangeProcess") CustomExchange exchange){
-		return BindingBuilder.bind(queue).to(exchange).with(amqpConstants.ROUTING_KEY_PROCESS_RADARR).noargs();
+	public Binding bindingProcessRadarr(@Qualifier("queueProcessRadarr") Queue queue, @Qualifier("exchangeProcess") DirectExchange exchange){
+		return BindingBuilder.bind(queue).to(exchange).with(amqpConstants.ROUTING_KEY_PROCESS_RADARR);
 	}
 	
 	@Bean
 	@Qualifier("bindingProcessSonarr")
-	public Binding bindingProcessSonarr(@Qualifier("queueProcessSonarr") Queue queue, @Qualifier("exchangeProcess") CustomExchange exchange){
-		return BindingBuilder.bind(queue).to(exchange).with(amqpConstants.ROUTING_KEY_PROCESS_SONARR).noargs();
+	public Binding bindingProcessSonarr(@Qualifier("queueProcessSonarr") Queue queue, @Qualifier("exchangeProcess") DirectExchange exchange){
+		return BindingBuilder.bind(queue).to(exchange).with(amqpConstants.ROUTING_KEY_PROCESS_SONARR);
 	}
 	
 	@Bean
 	@Qualifier("bindingProcessTautulli")
-	public Binding bindingProcessTautulli(@Qualifier("queueProcessTautulli") Queue queue, @Qualifier("exchangeProcess") CustomExchange exchange){
-		return BindingBuilder.bind(queue).to(exchange).with(amqpConstants.ROUTING_KEY_PROCESS_TAUTULLI).noargs();
+	public Binding bindingProcessTautulli(@Qualifier("queueProcessTautulli") Queue queue, @Qualifier("exchangeProcess") DirectExchange exchange){
+		return BindingBuilder.bind(queue).to(exchange).with(amqpConstants.ROUTING_KEY_PROCESS_TAUTULLI);
 	}
 	
 	@Bean
